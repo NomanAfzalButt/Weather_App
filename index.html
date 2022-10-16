@@ -8,7 +8,7 @@
     
 </head>
 <body>
-    
+<div id="back_box">
     <form onsubmit="doGetWeather(); return false">
     <h1>Weather App</h1>
     <label for="CityOrCountryInput">Search</label> <input type="text" id="input_txt">
@@ -19,10 +19,15 @@
     <div id="temp"></div>
     <div id="feel"></div>
     <div id="humidity"></div>
+    <div id="weather"></div>
     <div id="pressure"></div>
     <div id="visibility"></div>
     <div id="wind_deg"></div>
     <div id="wind_speed"></div>
+    <div id="sunrise"></div>
+    <div id="sunset"></div>
+</div>
+
 
 
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
@@ -39,12 +44,22 @@
             console.log(response.data);
             document.querySelector("#name").innerHTML = `<h1>Name:</h1><h2>${response.data.name}</h2>`;
             document.querySelector("#temp").innerHTML = `<h1>Temperature:</h1><h2>${response.data.main.temp}°C</h2 >`;
+            document.querySelector("#weather").innerHTML = `<h1>Weather:</h1><h2>${response.data.weather.O.description}</h2 >`;
             document.querySelector("#feel").innerHTML = `<h1>Feels Like:</h1><h2>${response.data.main.feels_like}°C</h2>`;
             document.querySelector("#humidity").innerHTML = `<h1>Humidity:</h1><h2>${response.data.main.humidity}%</h2>`;
             document.querySelector("#pressure").innerHTML = `<h1>Pressure:</h1><h2>${response.data.main.pressure} hPa</h2> <h3>Normal 1000 hPa</h3>`;
             document.querySelector("#visibility").innerHTML = `<h1>Visibility:</h1><h2>${response.data.visibility} m</h2> <h3>Maximum 10000 m</h3>`;
             document.querySelector("#wind_deg").innerHTML = `<h1>Wind Direction:</h1><h2>${response.data.wind.deg}°</h2>`;
             document.querySelector("#wind_speed").innerHTML = `<h1>Wind Speed:</h1><h2>${response.data.wind.speed} m/s</h2>`;
+            let sec = response.data.sys.sunrise;
+            let date = new Date(sec * 1000);
+            let timestring = date.toLocaleTimeString();
+            let ssec = response.data.sys.sunset;
+            let sdate = new Date(ssec * 1000);
+            let stimestring = sdate.toLocaleTimeString();
+            document.querySelector("#sunrise").innerHTML = `<h1>Sunrise:</h1><h2>${timestring} </h2>`;
+
+            document.querySelector("#sunset").innerHTML = `<h1>Sunset:</h1><h2>${stimestring} </h2>`;
 
 
         })
