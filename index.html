@@ -1,32 +1,159 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weather App</title>
-    
-</head>
-<body>
-<div id="back_box">
-    <form onsubmit="doGetWeather(); return false">
-    <h1>Weather App</h1>
-    <label for="CityOrCountryInput">Search</label> <input type="text" id="input_txt">
-    <button type="submit">Search</button>
-    </form>
+    <style>
+        body {
+            /* background-image: url(https://images.pexels.com/photos/281260/pexels-photo-281260.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1); */
+            background-color: whitesmoke;
+            background-repeat: no-repeat;
+            background-size: cover;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: monospace;
+        }
 
-    <div id="name"></div>
-    <div id="temp"></div>
-    <div id="feel"></div>
-    <div id="humidity"></div>
-    <div id="weather"></div>
-    <div id="pressure"></div>
-    <div id="visibility"></div>
-    <div id="wind_deg"></div>
-    <div id="wind_speed"></div>
-    <div id="sunrise"></div>
-    <div id="sunset"></div>
-</div>
+        #back_box {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .heading {
+            text-align: center;
+
+        }
+
+        #main {
+            display: none;
+            background-size: cover;
+            color: white;
+            border-radius: 10px;
+            width: 80%;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        #main>div {
+
+            background: rgba(255, 255, 255, 0.24);
+            border: 2px solid blue;
+            border-radius: 16px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(2.5px);
+            -webkit-backdrop-filter: blur(2.5px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            margin: 20px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            justify-content: flex-start;
+            align-items: center;
+            width: 250px;
+            height: 200px;
+        }
+
+        form>label {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        form input {
+            padding: 10px;
+            width: 350px;
+            border: 1px solid black;
+        }
+
+        input:focus {
+            border: 2px solid black;
+        }
+
+        button {
+            background: none;
+            width: 100px;
+            border: 2px solid black;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 4ms;
+            font-family: monospace;
+            font-size: large;
+        }
+
+        button:hover {
+            background-color: lightgrey;
+            color: black;
+        }
+
+        #form_div {
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            margin-top: 50px;
+            padding: 25px;
+            font-size: large;
+            background: linear-gradient(-45deg, #ee7752, #ee6599, #45beeb, #23d5ab);
+            background-size: 400%;
+            animation: gradient 15s ease infinite;
+            height: 400px;
+        }
+
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        #input_txt {
+            font-family: monospace;
+            font-size: large;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+</head>
+
+<body>
+    <div id="back_box">
+        <div id="form_div">
+            <form onsubmit="doGetWeather(); return false">
+                <h1 class="heading" style="font-size: 70px; padding-bottom: 20px;">Weather App</h1>
+                <div id="time" style="text-align: center;"></div>
+                <label for="CityOrCountryInput">Enter Name</label>
+                <input type="text" placeholder="Enter City/Country Name" id="input_txt">
+                <button type="submit">Search</button>
+            </form>
+        </div>
+
+        <div id="main">
+            <div id="name"></div>
+            <div id="weather"></div>
+            <div id="temp"></div>
+            <div id="feel"></div>
+            <div id="humidity"></div>
+            <div id="pressure"></div>
+            <div id="visibility"></div>
+            <div id="wind_deg"></div>
+            <div id="wind_speed"></div>
+            <div id="sunrise"></div>
+            <div id="sunset"></div>
+        </div>
+    </div>
 
 
 
@@ -34,41 +161,82 @@
 
     <script>
 
+        document.querySelector("#time").innerHTML = `<h1>${moment().format('LT')}</h1><h1>${moment().format('ll')}</h1>`;
+
         let doGetWeather = () => {
 
-        let input = document.querySelector("#input_txt").value;
+            let input = document.querySelector("#input_txt").value;
+            let main = document.getElementById("main")
+            main.style.display = 'flex'
+            axios.get(`https://api.openweathermap.org/data/2.5/weather?units=metric&appid=b4cee5364b20ed4235d4be591ec07e21&q=${input}`)
+                .then(function (response) {
+                    console.log(response.data);
+                    const weather = response.data
+                    switch (weather.weather[0].description) {
+                        case 'clear sky':
+                            main.style.backgroundImage = "url('https://cdn.pixabay.com/photo/2018/08/06/22/55/sun-3588618__480.jpg')"
+                            break;
+                        case 'Smoke':
+                            main.style.backgroundImage = "url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT0s5cwZo-5jjyS8q9NaDAHhFoKSH35hFkwOQ&usqp=CAU')"
+                            break;
+                        case 'light rain':
+                            main.style.backgroundImage = "url('https://images.unsplash.com/photo-1610741083757-1ae88e1a17f7?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8cmFpbnklMjBkYXl8ZW58MHx8MHx8&w=1000&q=80')"
+                            break;
+                        case 'heavy intensity rain':
+                            main.style.backgroundImage = "url('https://imengine.public.prod.dur.navigacloud.com/?uuid=6B1E0381-5A0D-4A4B-B336-3298EDFB8CDD&function=original&type=preview')"
+                            break;
+                        case 'moderate rain':
+                            main.style.backgroundImage = "url('https://img.onmanorama.com/content/dam/mm/en/kerala/top-news/images/2022/5/18/kerala-rain.jpg')"
+                            break;
+                        case 'overcast clouds':
+                            main.style.backgroundImage = "url('https://www.howitworksdaily.com/wp-content/uploads/2020/05/sky-4237062_1920-1024x576.jpg')"
+                            break;
+                        case 'few clouds':
+                            main.style.backgroundImage = "url('https://s7d2.scene7.com/is/image/TWCNews/blue-sky-with-sunjpg')"
+                            break;
+                        case 'broken clouds':
+                            main.style.backgroundImage = "url('https://upload.wikimedia.org/wikipedia/commons/e/eb/Scattered_clouds_in_sky.jpg ')"
+                            break;
+                        case 'scattered clouds':
+                            main.style.backgroundImage = "url('https://live.staticflickr.com/2106/1909487867_de140c7eb8_b.jpg')"
+                            break;
+                        case 'haze':
+                            main.style.backgroundImage = "url('https://thumbs.dreamstime.com/b/heavy-fog-dawn-park-foggy-weather-109738115.jpg')"
+                            break;
 
-        axios.get(`https://api.openweathermap.org/data/2.5/weather?units=metric&appid=b4cee5364b20ed4235d4be591ec07e21&q=${input}`)
-        .then(function (response) {
-            // handle success
-            console.log(response.data);
-            document.querySelector("#name").innerHTML = `<h1>Name:</h1><h2>${response.data.name}</h2>`;
-            document.querySelector("#temp").innerHTML = `<h1>Temperature:</h1><h2>${response.data.main.temp}°C</h2 >`;
-            document.querySelector("#weather").innerHTML = `<h1>Weather:</h1><h2>${response.data.weather.O.description}</h2 >`;
-            document.querySelector("#feel").innerHTML = `<h1>Feels Like:</h1><h2>${response.data.main.feels_like}°C</h2>`;
-            document.querySelector("#humidity").innerHTML = `<h1>Humidity:</h1><h2>${response.data.main.humidity}%</h2>`;
-            document.querySelector("#pressure").innerHTML = `<h1>Pressure:</h1><h2>${response.data.main.pressure} hPa</h2> <h3>Normal 1000 hPa</h3>`;
-            document.querySelector("#visibility").innerHTML = `<h1>Visibility:</h1><h2>${response.data.visibility} m</h2> <h3>Maximum 10000 m</h3>`;
-            document.querySelector("#wind_deg").innerHTML = `<h1>Wind Direction:</h1><h2>${response.data.wind.deg}°</h2>`;
-            document.querySelector("#wind_speed").innerHTML = `<h1>Wind Speed:</h1><h2>${response.data.wind.speed} m/s</h2>`;
-            let sec = response.data.sys.sunrise;
-            let date = new Date(sec * 1000);
-            let timestring = date.toLocaleTimeString();
-            let ssec = response.data.sys.sunset;
-            let sdate = new Date(ssec * 1000);
-            let stimestring = sdate.toLocaleTimeString();
-            document.querySelector("#sunrise").innerHTML = `<h1>Sunrise:</h1><h2>${timestring} </h2>`;
+                        default:
+                            main.style.backgroundImage = "url('https://nordicapis.com/wp-content/uploads/5-Best-Free-and-Paid-Weather-APIs-2019-e1587582023501.png')"
+                            break;
+                    }
+                    document.querySelector("#name").innerHTML = `<h1>Name:</h1><h2>${weather.name}</h2>`;
+                    document.querySelector("#temp").innerHTML = `<h1>Temperature:</h1><h2>${weather.main.temp}°C</h2 >`;
+                    document.querySelector("#weather").innerHTML = `<h1>Weather:</h1><h2>${weather.weather[0].description}</h2 > 
+                                                            <img width="50" src="http://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png"/>`;
+                    document.querySelector("#feel").innerHTML = `<h1>Feels Like:</h1><h2>${weather.main.feels_like}°C</h2>`;
+                    document.querySelector("#humidity").innerHTML = `<h1>Humidity:</h1><h2>${weather.main.humidity}%</h2>`;
+                    document.querySelector("#pressure").innerHTML = `<h1>Pressure:</h1><h2>${weather.main.pressure} hPa</h2> <h3>Normal 1000 hPa</h3>`;
+                    document.querySelector("#visibility").innerHTML = `<h1>Visibility:</h1><h2>${weather.visibility} m</h2> <h3>Maximum 10000 m</h3>`;
+                    document.querySelector("#wind_deg").innerHTML = `<h1>Wind Direction:</h1><h2>${weather.wind.deg}°</h2>`;
+                    document.querySelector("#wind_speed").innerHTML = `<h1>Wind Speed:</h1><h2>${weather.wind.speed} m/s</h2>`;
+                    let sec = weather.sys.sunrise;
+                    let date = new Date(sec * 1000);
+                    let timestring = date.toLocaleTimeString();
+                    let ssec = weather.sys.sunset;
+                    let sdate = new Date(ssec * 1000);
+                    let stimestring = sdate.toLocaleTimeString();
+                    document.querySelector("#sunrise").innerHTML = `<h1>Sunrise:</h1><h2>${timestring} </h2>`;
 
-            document.querySelector("#sunset").innerHTML = `<h1>Sunset:</h1><h2>${stimestring} </h2>`;
+                    document.querySelector("#sunset").innerHTML = `<h1>Sunset:</h1><h2>${stimestring} </h2>`;
 
 
-        })
-        .catch(function (error) {
-            // handle error
-            console.log(error);
-        })
-        
+                })
+                .catch(function (error) {
+                    // handle error
+                    console.log(error);
+                })
+
         }
     </script>
 </body>
+
 </html>
